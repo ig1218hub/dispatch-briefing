@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>출동 전 브리핑</title>
+<style>
+:root{
+  --bg:#f5f6f8;--surface:#fff;--text:#1a1d23;--muted:#667085;--line:#e4e7ec;
+  --now:#d92d20;--now-bg:#fef3f2;--remote:#b54708;--remote-bg:#fffaeb;--later:#067647;--later-bg:#ecfdf3;
+  --l1:#067647;--l1-bg:#dcfae6;--l2:#b54708;--l2-bg:#fef0c7;--l3:#475467;--l3-bg:#eaecf0;--accent:#1570ef;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1115;--surface:#181b21;--text:#e6e8ec;--muted:#98a2b3;--line:#2a2f38;
+  --now:#f97066;--now-bg:#3a1714;--remote:#fdb022;--remote-bg:#33260b;--later:#47cd89;--later-bg:#0e2a1c;
+  --l1:#47cd89;--l1-bg:#0e2a1c;--l2:#fdb022;--l2-bg:#33260b;--l3:#98a2b3;--l3-bg:#262b33;--accent:#53b1fd;}}
+:root[data-theme="dark"]{
+  --bg:#0f1115;--surface:#181b21;--text:#e6e8ec;--muted:#98a2b3;--line:#2a2f38;
+  --now:#f97066;--now-bg:#3a1714;--remote:#fdb022;--remote-bg:#33260b;--later:#47cd89;--later-bg:#0e2a1c;
+  --l1:#47cd89;--l1-bg:#0e2a1c;--l2:#fdb022;--l2-bg:#33260b;--l3:#98a2b3;--l3-bg:#262b33;--accent:#53b1fd;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,"Malgun Gothic",sans-serif}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+header h1{font-size:20px;margin:0}
+header p{margin:2px 0 12px;color:var(--muted);font-size:13px}
+.mock{display:inline-block;font-size:11px;padding:1px 6px;border-radius:4px;background:var(--l2-bg);color:var(--l2);margin-left:6px;vertical-align:middle}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;cursor:pointer}
+.kpi b{display:block;font-size:22px}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi.now b{color:var(--now)}.kpi.remote b{color:var(--remote)}.kpi.later b{color:var(--later)}
+.kpi.active{outline:2px solid var(--accent)}
+.sub{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--muted);margin-bottom:12px}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.filters input,.filters select{flex:1 1 140px;min-width:0;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font:inherit}
+.card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;margin-bottom:8px}
+.card.now{border-left-color:var(--now)}.card.remote{border-left-color:var(--remote)}.card.later{border-left-color:var(--later)}
+.head{padding:12px;cursor:pointer;display:grid;gap:4px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.title{font-weight:700;font-size:15px}
+.muted{color:var(--muted);font-size:12px}
+.badge{font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.b-now{background:var(--now-bg);color:var(--now)}.b-remote{background:var(--remote-bg);color:var(--remote)}.b-later{background:var(--later-bg);color:var(--later)}
+.b-L1{background:var(--l1-bg);color:var(--l1)}.b-L2{background:var(--l2-bg);color:var(--l2)}.b-L3{background:var(--l3-bg);color:var(--l3)}
+.b-grade{border:1px solid var(--line);color:var(--muted)}
+.body{display:none;border-top:1px solid var(--line);padding:12px}
+.card.open .body{display:block}
+.caution{background:var(--remote-bg);color:var(--text);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:13px}
+.caution div+div{margin-top:2px}
+.contact a{color:var(--accent)}
+.section{border:1px solid var(--line);border-radius:8px;padding:10px;margin-top:10px}
+.section h3{margin:0 0 6px;font-size:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.diag{margin:8px 0;padding:8px;border-radius:6px;background:var(--bg)}
+.cause{font-weight:700}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.tbl th,.tbl td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{color:var(--muted);font-weight:500}
+.scroll{overflow-x:auto}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.chip{font-size:12px;padding:2px 8px;border:1px solid var(--line);border-radius:6px}
+.lbl{font-size:12px;color:var(--muted);margin-top:8px}
+.top10{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:12px}
+.top10 summary{cursor:pointer;font-weight:600}
+.empty{text-align:center;color:var(--muted);padding:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>출동 전 브리핑 <span class="mock">목업 데이터</span></h1>
+  <p>기준일 2026-10-08 · 알람 480건 · 기지국 225곳</p>
+</header>
+
+<div class="kpis" id="kpis"></div>
+<div class="sub" id="levels"></div>
+
+<details class="top10">
+  <summary>🔁 반복 장애 Top 10</summary>
+  <table class="tbl"><thead><tr><th>#</th><th>기지국</th><th>조치이력</th><th>재발 Y</th></tr></thead><tbody id="top10"></tbody></table>
+</details>
+
+<div class="filters">
+  <input id="q" placeholder="기지국ID·기지국명·알람명 검색">
+  <select id="fBranch"><option value="">전체 지사</option></select>
+  <select id="fGrade"><option value="">전체 등급</option><option>Critical</option><option>Major</option><option>Minor</option><option>Warning</option></select>
+  <select id="fLevel"><option value="">전체 근거</option><option value="L1">근거</option><option value="L2">추정</option><option value="L3">이력 없음</option></select>
+</div>
+
+<div id="list"></div>
+</div>
+
+<script>
+const DISPATCH = {now:{label:"🔴 지금 바로 출동",o:0},remote:{label:"🟡 원격 조치 먼저",o:1},later:{label:"🟢 다음 정기점검",o:2}};
+const LEVEL = {L1:"근거",L2:"추정(전체 통계)",L3:"이력 없음"};
+const GRADE = {Critical:0,Major:1,Minor:2,Warning:3};
+
+// 목업 데이터 — SPEC §9.2 스키마
+const CARDS = [
+ {card_id:"GGI-0023",site:{id:"GGI-0023",name:"일산동구공단로23",branch:"경기지사",address:"경기 고양시 일산동구 공단로 23",install_type:"철탑",high_work:true,manager:"김현장",phone:"010-0000-0001"},
+  dispatch:{class:"now",reason:"미해제 Critical (정류기)"},
+  summary:{alarm_count:4,top_grade:"Critical",unresolved:1,top_alarm:"Battery Low Voltage"},
+  cautions:["⚠️ 고소작업: 안전대·2인 1조, 강풍·우천 시 작업 중지","승주 장비 지참","⚡ 전기 작업: 절연 장비 지참","🔁 재발 이력: 근본 원인 확인 필요"],
+  sections:[
+   {equip_type:"정류기",dispatch:{class:"now",reason:"미해제 Critical"},
+    alarms:[{id:"ALM-20261008-0008",name:"Battery Low Voltage",group:"PW_BATTERY",grade:"Critical",start:"00:36",end:"—",status:"미해제"},
+            {id:"ALM-20261008-0101",name:"Battery Low Voltage",group:"PW_BATTERY",grade:"Major",start:"06:12",end:"06:40",status:"해제"}],
+    diagnoses:[{group:"PW_BATTERY",level:"L1",label:"근거",primary:["정류기 배터리 열화(내부저항 증가)"],share:0.67,confidence:"높음",
+      candidates:[["한전 일시 정전",1]],same_symptom_count:3,recur_rate:0.67,natural_recovery:0,
+      records:[{date:"2026-09-14",recent:true,cause:"정류기 배터리 열화(내부저항 증가)",action:"배터리 균등충전 후 경과관찰",recur:"Y",worker:"박○○"},
+               {date:"2026-06-02",recent:false,cause:"정류기 배터리 열화(내부저항 증가)",action:"배터리 균등충전 후 경과관찰",recur:"Y",worker:"이○○"},
+               {date:"2026-01-20",recent:false,cause:"한전 일시 정전",action:"한전 복전 확인",recur:"N",worker:"박○○"}]}],
+    equipment:[{serial:"XP17-000201",model:"DSR-4810",firmware:"1.2.0",age_years:9,fault_count:4,note:"배터리 미교체",signals:["📈 누적고장 4회","⚠️ 배터리 미교체","🕰️ 설치 9년차"]}],
+    equipment_ref:[],
+    materials:[{item:"배터리 측정기",estimated:false},{item:"예비 배터리",estimated:false}]},
+   {equip_type:"RU",dispatch:{class:"later",reason:"해제 Minor"},
+    alarms:[{id:"ALM-20261008-0230",name:"RU Temperature High",group:"RU_TEMP",grade:"Minor",start:"13:05",end:"13:50",status:"해제"}],
+    diagnoses:[{group:"RU_TEMP",level:"L2",label:"추정(전체 통계)",primary:["RU 하드웨어 불량"],share:0.41,confidence:null,
+      candidates:[["일시적 RF 간섭",5]],same_symptom_count:0,recur_rate:null,natural_recovery:0,records:[]}],
+    equipment:[],equipment_ref:[],
+    materials:[{item:"예비 RU",estimated:true},{item:"점퍼케이블",estimated:true}]}]},
+
+ {card_id:"GWJ-0007",site:{id:"GWJ-0007",name:"북구시청로07",branch:"광주지사",address:"광주 북구 시청로 7",install_type:"옥탑",high_work:true,manager:"최현장",phone:"010-0000-0002"},
+  dispatch:{class:"now",reason:"HW 원인 + 재발 이력 (광모듈)"},
+  summary:{alarm_count:2,top_grade:"Major",unresolved:0,top_alarm:"SFP Receive Power Low"},
+  cautions:["⚠️ 고소작업: 안전대·2인 1조, 강풍·우천 시 작업 중지","건물 출입 사전 연락"],
+  sections:[
+   {equip_type:"광모듈",dispatch:{class:"now",reason:"HW 원인 + 재발 이력"},
+    alarms:[{id:"ALM-20261008-0001",name:"SFP Receive Power Low",group:"SFP_RX_LOW",grade:"Major",start:"00:01",end:"01:46",status:"해제"},
+            {id:"ALM-20261008-0144",name:"SFP Receive Power Low",group:"SFP_RX_LOW",grade:"Minor",start:"08:20",end:"08:55",status:"해제"}],
+    diagnoses:[{group:"SFP_RX_LOW",level:"L1",label:"근거",primary:["광커넥터 오염","광모듈(SFP) 노후로 수광파워 저하"],share:0.5,confidence:"보통",
+      candidates:[],same_symptom_count:2,recur_rate:0.5,natural_recovery:0,
+      records:[{date:"2026-08-11",recent:true,cause:"광커넥터 오염",action:"광커넥터 클리닝",recur:"Y",worker:"정○○"},
+               {date:"2026-02-03",recent:false,cause:"광모듈(SFP) 노후로 수광파워 저하",action:"SFP 모듈 교체",recur:"N",worker:"정○○"}]}],
+    equipment:[{serial:"XO18-000410",model:"GL-SFP28-10K",firmware:"1.2.0",age_years:8,fault_count:2,note:"",signals:["🕰️ 설치 8년차"]}],
+    equipment_ref:[],
+    materials:[{item:"광클리너",estimated:false},{item:"광파워미터",estimated:false},{item:"SFP 모듈",estimated:false}]}]},
+
+ {card_id:"GWN-0023",site:{id:"GWN-0023",name:"강릉시시청로23",branch:"강원지사",address:"강원 강릉시 시청로 23",install_type:"실내",high_work:false,manager:"한현장",phone:"010-0000-0003"},
+  dispatch:{class:"remote",reason:"원격 확인 원인 · 오늘 3회 반복 ↑ (DU)"},
+  summary:{alarm_count:3,top_grade:"Major",unresolved:0,top_alarm:"DU Software Abnormal Restart"},
+  cautions:["출입 승인 확인"],
+  sections:[
+   {equip_type:"DU",dispatch:{class:"remote",reason:"REMOTE 원인 · 오늘 3회 반복 ↑"},
+    alarms:[{id:"ALM-20261008-0003",name:"DU Software Abnormal Restart",group:"DU_RESTART",grade:"Major",start:"00:08",end:"00:48",status:"해제"},
+            {id:"ALM-20261008-0188",name:"DU Software Abnormal Restart",group:"DU_RESTART",grade:"Major",start:"09:41",end:"10:02",status:"해제"},
+            {id:"ALM-20261008-0310",name:"DU Software Abnormal Restart",group:"DU_RESTART",grade:"Minor",start:"16:22",end:"16:30",status:"해제"}],
+    diagnoses:[{group:"DU_RESTART",level:"L1",label:"근거",primary:["펌웨어 버그(메모리 누수)로 비정상 재기동"],share:1,confidence:"높음",
+      candidates:[],same_symptom_count:2,recur_rate:0.5,natural_recovery:0,
+      records:[{date:"2026-09-28",recent:true,cause:"펌웨어 버그(메모리 누수)로 비정상 재기동",action:"DU 원격 리셋",recur:"Y",worker:"윤○○"},
+               {date:"2026-05-17",recent:false,cause:"펌웨어 버그(메모리 누수)로 비정상 재기동",action:"DU 원격 리셋",recur:"N",worker:"윤○○"}]}],
+    equipment:[{serial:"SD21-000088",model:"SMR-DU-20",firmware:"R5.1",age_years:5,fault_count:3,note:"2026-03 펌웨어 업그레이드",signals:["📈 누적고장 3회","🔧 2026-03 펌웨어 업그레이드"]}],
+    equipment_ref:[],
+    materials:[{item:"노트북·콘솔케이블 (원격 리셋 먼저)",estimated:false}]}]},
+
+ {card_id:"DGU-0012",site:{id:"DGU-0012",name:"달서구역삼로12",branch:"대구지사",address:"대구 달서구 역삼로 12",install_type:"폴",high_work:true,manager:"오현장",phone:"010-0000-0004"},
+  dispatch:{class:"later",reason:"해제 Minor (광모듈)"},
+  summary:{alarm_count:1,top_grade:"Minor",unresolved:0,top_alarm:"SFP Not Present"},
+  cautions:["⚠️ 고소작업: 안전대·2인 1조, 강풍·우천 시 작업 중지","승주 장비 지참"],
+  sections:[
+   {equip_type:"광모듈",dispatch:{class:"later",reason:"해제 Minor"},
+    alarms:[{id:"ALM-20261008-0004",name:"SFP Not Present",group:"SFP_MISSING",grade:"Minor",start:"00:16",end:"01:43",status:"해제"}],
+    diagnoses:[{group:"SFP_MISSING",level:"L3",label:"이력 없음",primary:[],share:null,confidence:null,candidates:[],
+      same_symptom_count:0,recur_rate:null,natural_recovery:1,records:[]}],
+    equipment:[],
+    equipment_ref:[{serial:"ED19-000112",model:"ERX-BB-6648",firmware:"R23A",equip_type:"DU"}],
+    materials:[]}]},
+
+ {card_id:"SEL-0028",site:{id:"SEL-0028",name:"송파구중앙로28",branch:"서울지사",address:"서울 송파구 중앙로 28",install_type:"옥탑",high_work:false,manager:"서현장",phone:"010-0000-0005"},
+  dispatch:{class:"remote",reason:"해제 Critical (DU)"},
+  summary:{alarm_count:1,top_grade:"Critical",unresolved:0,top_alarm:"BTS RESET UNEXPECTED"},
+  cautions:["건물 출입 사전 연락"],
+  sections:[
+   {equip_type:"DU",dispatch:{class:"remote",reason:"해제 Critical"},
+    alarms:[{id:"ALM-20261008-0014",name:"BTS RESET UNEXPECTED",group:"DU_RESTART",grade:"Critical",start:"01:29",end:"04:50",status:"해제"}],
+    diagnoses:[{group:"DU_RESTART",level:"L2",label:"추정(전체 통계)",primary:["일시적 SW 오류"],share:0.48,confidence:null,
+      candidates:[["펌웨어 버그(메모리 누수)로 비정상 재기동",9]],same_symptom_count:0,recur_rate:null,natural_recovery:0,records:[]}],
+    equipment:[],equipment_ref:[],
+    materials:[{item:"노트북·콘솔케이블 (원격 리셋 먼저)",estimated:true}]}]}
+];
+const TOP10 = [["GGI-0023 일산동구공단로23",7,3],["GWJ-0007 북구시청로07",6,2],["SEL-0009 영등포구중앙로09",5,2],["GWN-0023 강릉시시청로23",5,1],["DJN-0012 서구대학로12",4,1]];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let fDispatch = "";
+
+function levelOf(card){ // 대표 판단 레벨 = 첫 섹션 첫 판단
+  return card.sections[0].diagnoses[0].level;
+}
+
+function renderKpis(){
+  const cnt = {now:0,remote:0,later:0};
+  CARDS.forEach(c => cnt[c.dispatch.class]++);
+  $("#kpis").innerHTML = Object.entries(DISPATCH).map(([k,v]) =>
+    `<div class="kpi ${k} ${fDispatch===k?"active":""}" data-k="${k}"><b>${cnt[k]}</b><span>${v.label}</span></div>`).join("");
+  document.querySelectorAll(".kpi").forEach(el => el.onclick = () => { fDispatch = fDispatch===el.dataset.k ? "" : el.dataset.k; renderKpis(); renderList(); });
+  const lv = {L1:0,L2:0,L3:0};
+  CARDS.forEach(c => c.sections.forEach(s => s.diagnoses.forEach(d => lv[d.level]++)));
+  $("#levels").innerHTML = Object.entries(lv).map(([k,n]) => `<span class="badge b-${k}">${LEVEL[k]} ${n}</span>`).join("");
+}
+
+function diagHtml(d){
+  const cause = d.primary.length ? d.primary.map(esc).join(" / ") : "—";
+  const meta = [];
+  if (d.level==="L1") meta.push(`같은 증상 ${d.same_symptom_count}건`, `재발률 ${Math.round(d.recur_rate*100)}%`, `신뢰도 ${d.confidence}`);
+  if (d.level==="L2") meta.push(`전체 기록 중 ${Math.round(d.share*100)}%`);
+  if (d.natural_recovery) meta.push(`자연복구 이력 ${d.natural_recovery}건`);
+  const cands = d.candidates.length ? `<div class="muted">후보: ${d.candidates.map(([c,n])=>`${esc(c)} ${n}건`).join(", ")}</div>` : "";
+  const recs = d.records.length ? `<div class="scroll"><table class="tbl"><thead><tr><th>조치일</th><th>실제원인</th><th>조치내용</th><th>재발</th><th>작업자</th></tr></thead><tbody>${
+    d.records.map(r=>`<tr><td>${r.recent?"🔺":""}${r.date}</td><td>${esc(r.cause)}</td><td>${esc(r.action)}</td><td>${r.recur}</td><td>${esc(r.worker)}</td></tr>`).join("")}</tbody></table></div>` : "";
+  return `<div class="diag"><div class="row"><span class="badge b-${d.level}">${LEVEL[d.level]}</span><span class="muted">${d.group}</span></div>
+    <div class="cause">${d.level==="L2"?"(추정) ":""}${cause}</div><div class="muted">${meta.join(" · ")}</div>${cands}${recs}</div>`;
+}
+
+function sectionHtml(s){
+  const alarms = `<div class="scroll"><table class="tbl"><thead><tr><th>알람</th><th>등급</th><th>발생~해제</th><th>상태</th></tr></thead><tbody>${
+    s.alarms.map(a=>`<tr><td>${esc(a.name)}</td><td>${a.grade}</td><td>${a.start}~${a.end}</td><td>${a.status==="미해제"?"🔴 미해제":"해제"}</td></tr>`).join("")}</tbody></table></div>`;
+  const eq = s.equipment.length
+    ? s.equipment.map(e=>`<div class="muted">${esc(e.serial)} · ${esc(e.model)} · FW ${esc(e.firmware)}</div>
+        <div class="chips">${e.signals.map(x=>`<span class="chip">${esc(x)}</span>`).join("")}<span class="muted">추정 보강</span></div>`).join("")
+    : s.equipment_ref.length
+      ? `<div class="muted">같은 장비구분 기록 없음 · 참고: ${s.equipment_ref.map(e=>`${e.equip_type} ${esc(e.model)}`).join(", ")}</div>`
+      : `<div class="muted">장비 기록 없음</div>`;
+  const mats = s.materials.length
+    ? `<div class="chips">${s.materials.map(m=>`<span class="chip">${esc(m.item)}${m.estimated?" (추정)":""}</span>`).join("")}</div>`
+    : `<div class="muted">별도 자재 없음</div>`;
+  return `<div class="section"><h3>${s.equip_type}<span class="badge b-${s.dispatch.class}">${DISPATCH[s.dispatch.class].label}</span><span class="muted">${esc(s.dispatch.reason)}</span></h3>
+    ${alarms}<div class="lbl">원인 판단</div>${s.diagnoses.map(diagHtml).join("")}
+    <div class="lbl">장비</div>${eq}<div class="lbl">챙길 자재</div>${mats}</div>`;
+}
+
+function cardHtml(c){
+  const d0 = c.sections[0].diagnoses[0];
+  const cause = d0.primary.length ? d0.primary.join(" / ") : "원인 판단 불가";
+  return `<div class="card ${c.dispatch.class}" data-id="${c.card_id}">
+    <div class="head">
+      <div class="row"><span class="badge b-${c.dispatch.class}">${DISPATCH[c.dispatch.class].label}</span><span class="muted">${esc(c.dispatch.reason)}</span></div>
+      <div class="row"><span class="title">${esc(c.site.name)}</span><span class="muted">${c.site.id} · ${c.site.branch}</span>${c.site.high_work?'<span title="고소작업">⚠️ 고소</span>':""}</div>
+      <div class="row"><span class="badge b-grade">${c.summary.top_grade}</span><span>${esc(c.summary.top_alarm)}</span>
+        <span class="muted">알람 ${c.summary.alarm_count}건${c.summary.unresolved?` · 미해제 ${c.summary.unresolved}`:""} · 장비 ${c.sections.length}종</span></div>
+      <div class="row"><span class="badge b-${d0.level}">${LEVEL[d0.level]}</span><span>${d0.level==="L2"?"(추정) ":""}${esc(cause)}</span></div>
+    </div>
+    <div class="body">
+      <div class="caution">${c.cautions.map(x=>`<div>${esc(x)}</div>`).join("")}</div>
+      <div class="contact muted">${esc(c.site.address)} · 설치형태 ${c.site.install_type} · 담당 ${esc(c.site.manager)} <a href="tel:${c.site.phone}">${c.site.phone}</a></div>
+      ${c.sections.map(sectionHtml).join("")}
+    </div></div>`;
+}
+
+function renderList(){
+  const q = $("#q").value.trim().toLowerCase(), br = $("#fBranch").value, gr = $("#fGrade").value, lv = $("#fLevel").value;
+  const list = CARDS.filter(c =>
+    (!fDispatch || c.dispatch.class===fDispatch) && (!br || c.site.branch===br) && (!gr || c.summary.top_grade===gr) &&
+    (!lv || c.sections.some(s=>s.diagnoses.some(d=>d.level===lv))) &&
+    (!q || [c.site.id,c.site.name,...c.sections.flatMap(s=>s.alarms.map(a=>a.name))].join(" ").toLowerCase().includes(q))
+  ).sort((a,b) => DISPATCH[a.dispatch.class].o-DISPATCH[b.dispatch.class].o || GRADE[a.summary.top_grade]-GRADE[b.summary.top_grade]
+     || b.summary.unresolved-a.summary.unresolved || b.summary.alarm_count-a.summary.alarm_count);
+  $("#list").innerHTML = list.length ? list.map(cardHtml).join("") : `<div class="empty">조건에 맞는 카드가 없습니다</div>`;
+  document.querySelectorAll(".head").forEach(h => h.onclick = () => h.parentElement.classList.toggle("open"));
+}
+
+[...new Set(CARDS.map(c=>c.site.branch))].sort().forEach(b => $("#fBranch").insertAdjacentHTML("beforeend", `<option>${b}</option>`));
+$("#top10").innerHTML = TOP10.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r[0])}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+["#q","#fBranch","#fGrade","#fLevel"].forEach(s => $(s).addEventListener("input", renderList));
+renderKpis(); renderList();
+</script>
+</body>
+</html>

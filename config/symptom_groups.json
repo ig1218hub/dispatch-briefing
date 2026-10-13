@@ -1,0 +1,15 @@
+{
+  "RU_LINK":      {"equip_type": "RU",      "alarms": ["RU Link Down (CPRI)", "RiLink Failure", "CELL FAULTY - RF MODULE LINK LOST"]},
+  "RU_TEMP":      {"equip_type": "RU",      "alarms": ["RU Temperature High", "Radio Temperature Exceeded", "RF MODULE OVERHEAT"]},
+  "RU_VSWR":      {"equip_type": "RU",      "alarms": ["RU VSWR High", "VSWR Over Threshold", "ANTENNA LINE VSWR MAJOR"]},
+  "DU_HW":        {"equip_type": "DU",      "alarms": ["DU Board Fail", "Baseband HW Fault", "BASE STATION FAULTY - SYSTEM MODULE"]},
+  "DU_RESTART":   {"equip_type": "DU",      "alarms": ["DU Software Abnormal Restart", "Unexpected Node Restart", "BTS RESET UNEXPECTED"]},
+  "DU_SYNC":      {"equip_type": "DU",      "alarms": ["DU Clock Sync Loss (GPS)", "TimeSyncIO Reference Failed", "SYNC REFERENCE SOURCE LOST"]},
+  "SFP_MISSING":  {"equip_type": "광모듈",  "alarms": ["SFP Not Present", "SFP Module Missing", "SFP MODULE NOT DETECTED"]},
+  "SFP_RX_LOW":   {"equip_type": "광모듈",  "alarms": ["SFP Rx Power Low", "SFP Receive Power Low", "SFP RX OPTICAL POWER LOW"]},
+  "TR_LINK_DOWN": {"equip_type": "전송장비", "alarms": ["Backhaul Link Down", "Transport Link Failure", "TRANSPORT ETHERNET LINK DOWN"]},
+  "TR_ERROR":     {"equip_type": "전송장비", "alarms": ["Ethernet CRC Error", "Ethernet Port Degraded", "ETHERNET FRAME ERROR RATE"]},
+  "PW_AC_FAIL":   {"equip_type": "정류기",  "alarms": ["AC Mains Fail", "Mains Failure", "EXTERNAL AC POWER FAILURE"]},
+  "PW_BATTERY":   {"equip_type": "정류기",  "alarms": ["Battery Low Voltage", "Battery Voltage Too Low", "BATTERY UNDER VOLTAGE"]},
+  "PW_RECTIFIER": {"equip_type": "정류기",  "alarms": ["Rectifier Module Fail", "PSU Fault", "POWER RECTIFIER UNIT FAULT"]}
+}

@@ -1,0 +1,13 @@
+# 의존성·빌드
+node_modules/
+dist/
+__pycache__/
+tools/
+.playwright-mcp/
+
+# 원본 데이터 (사내 DRM 문서, 담당자 연락처 포함) — 저장소에 올리지 않음
+*.xlsx
+*.csv
+
+# 생성 결과 (담당자 연락처 포함)
+output/

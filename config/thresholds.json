@@ -1,0 +1,12 @@
+{
+  "base_date": "2026-10-08",
+  "recent_days": 90,
+  "fault_many": 3,
+  "recent_change_days": 90,
+  "old_years": 7,
+  "l1_high_min_count": 2,
+  "l1_high_min_share": 0.6,
+  "recur_caution_rate": 0.5,
+  "same_day_repeat": 3,
+  "small_sample": 5
+}
