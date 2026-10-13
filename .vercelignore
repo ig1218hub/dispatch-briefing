@@ -1,0 +1,7 @@
+# Vercel은 FE만 배포 (BE는 로컬 + trycloudflare)
+*.py
+tests/
+config/
+mockup/
+*.bat
+SPEC.md
